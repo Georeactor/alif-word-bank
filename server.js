@@ -38,7 +38,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/word', (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   let normal = Normal(req.body.word),
       w = new Word({
         language: 'ar',
