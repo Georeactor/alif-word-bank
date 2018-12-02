@@ -1,5 +1,6 @@
 const request = require('request'),
-      cheerio = require('cheerio');
+      cheerio = require('cheerio'),
+      isArabic = require('alif-toolkit').isArabic;
 
 let findGoodTopic = (language, callback) => {
   request('https://' + language + '.wikipedia.org/wiki/Special:Random', (err, resp, body) => {
@@ -13,6 +14,13 @@ let findGoodTopic = (language, callback) => {
     // remove year articles
     if (!isNaN(articleName * 1)) {
       return findGoodTopic(language, callback);
+    }
+
+    // must be all Arabic script
+    for (let c = 0; c < articleName.length; c++) {
+      if (!isArabic(articleName[c])) {
+        return findGoodTopic(language, callback);
+      }
     }
 
     let firstArticlePara = $($('.mw-parser-output > p')[0])
@@ -79,7 +87,7 @@ function addWord(err, articleName, articleClue) {
     return console.log(err);
   }
   console.log(articleName);
-  request.post('http://localhost:8080/word', {
+  request.post('https://alif-word-bank.herokuapp.com/word', {
     json: {
       word: articleName,
       clue: articleClue

@@ -41,6 +41,7 @@ app.post('/word', (req, res) => {
   console.log(req.body);
   let normal = Normal(req.body.word),
       w = new Word({
+        language: 'ar',
         clue: req.body.clue,
         normal: normal,
         word: req.body.word,
