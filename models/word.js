@@ -7,7 +7,8 @@ const wordSchema = mongoose.Schema({
   normal: String,
   shaped: [String],
   glyphs: [String],
-  baseline: [String]
+  baseline: [String],
+  categories: [String]
 });
 
 module.exports = mongoose.model('Word', wordSchema);

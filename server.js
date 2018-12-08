@@ -12,6 +12,9 @@ const Alif = require('alif-toolkit'),
 
 const Word = require('./models/word');
 
+const languages = ['ar', 'fa'],
+      catlanguages = ['en', 'ar', 'fa'];
+
 let app = express();
 
 console.log('Connecting to MongoDB (required)');
@@ -32,7 +35,55 @@ app.use(cookieParser());
 // }));
 
 app.get('/', (req, res) => {
-  Word.find({}, (err, words) => {
+  res.render('homepage');
+});
+
+app.get('/random/:language', (req, res) => {
+  let lang = req.params.language.toLowerCase()
+  if (languages.indexOf(lang) === -1) {
+    return res.json({
+      error: 'unsupported language'
+    });
+  }
+
+  Word.aggregate([{ $match: { language: lang }},
+                  { $sample: { size: 1 }}]).exec((err, words) => {
+    return res.json(err || words[0]);
+  });
+});
+
+app.get('/topic/:language/:category', (req, res) => {
+  let lang = req.params.language.toLowerCase()
+  if (languages.indexOf(lang) === -1) {
+    return res.json({
+      error: 'unsupported language'
+    });
+  }
+
+  let category = req.params.category.toLowerCase().split(':'),
+      catlang = category[0],
+      catname = category[1];
+  if (catlanguages.indexOf(catlang) === -1) {
+    return res.json({
+      error: 'unsupported language'
+    });
+  }
+
+  Word.aggregate([{ $match: { language: lang,
+                              categories: { $in: [catlang + ':' + catname] } } },
+                  { $sample: { size: 1 } }]).exec((err, words) => {
+    if (err) {
+      return res.json(err);
+    }
+    if (!words.length) {
+      return res.json({ error: 'none found' });
+    }
+    return res.json(words[0]);
+  });
+});
+
+app.get('/words', (req, res) => {
+  Word.aggregate([{ $sample: { size: 100 } }]).exec((err, words) => {
     return res.json(err || words);
   });
 });
@@ -47,7 +98,8 @@ app.post('/word', (req, res) => {
         word: req.body.word,
         glyphs: GlyphSplitter(normal),
         baseline: BaselineSplitter(normal),
-        shaped: GlyphSplitter(WordShaper(normal))
+        shaped: GlyphSplitter(WordShaper(normal)),
+        categories: req.body.categories || []
       });
   w.save((err) => {
     res.json(err || 'saved');

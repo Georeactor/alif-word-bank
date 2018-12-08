@@ -1,0 +1,13 @@
+body {
+  font-family: sans-serif;
+}
+
+code {
+  display: block;
+  font-size: 110%;
+}
+
+code.split {
+  display: inline-block;
+  left: 0;
+}

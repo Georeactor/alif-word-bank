@@ -91,7 +91,8 @@ function addWord(err, articleName, articleClue, language) {
     json: {
       word: articleName,
       clue: articleClue,
-      language: language
+      language: language,
+      categories: ['en:test', 'en:fail']
     }
   }, (err, response, body) => {
     console.log(err || body);
@@ -102,5 +103,5 @@ let wordCount = 200;
 for (var w = 0; w < wordCount; w++) {
   setTimeout(() => {
     findGoodTopic('fa', addWord);
-  }, Math.round(wordCount * 500 * Math.random()));
+  }, Math.round(wordCount * 600 * Math.random()));
 }
