@@ -30,12 +30,24 @@ html
     p returns a word from the selected language and category, in JSON format
     p You can use the language codes to simplify your app, or to make use of categories which are not available in all languages.
 
-    h4 Example: a crossword puzzle with 10 animal names
-    code for (let a = 0; a < 10; a++) {
-    code &nbsp;&nbsp;fetch("/topic/ar/ar:حيوانات").then(res => res.json()).then((word) => {
-    code &nbsp;&nbsp;&nbsp;&nbsp;addWord({ letters: word.glyphs, clue: word.clue });
-    code &nbsp;&nbsp;})
-    code }
+    h4 Example: get an Arabic article in the animals category, for a crossword puzzle
+    code fetch("/topic/ar/ar:حيوانات")
+    code &nbsp;&nbsp;.then(res => res.json())
+    code &nbsp;&nbsp;.then((word) => {
+    code })
+
+    h3 More API parameters
+    p Only articles with one-word titles (for example, for crossword puzzles)
+    code /topic/fa/en:countries?oneWord=true
+
+    p Get ten words at once
+    code /topic/ar/en:animals?count=10
+
+    p Only retrieve words which are also included in the Simple English Wikipedia (this increases the likelihood of a better-known or more understandable subject)
+    code /topic/ar/en:trees?inSimple=true
+
+    p Retrieve words with only one baseline (all letters connect)
+    code /topic/fa/en:countries?baseline=1
 
     h3 Using alif-toolkit
     code npm install alif-toolkit

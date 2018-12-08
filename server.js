@@ -38,6 +38,35 @@ app.get('/', (req, res) => {
   res.render('homepage');
 });
 
+app.get('/words', (req, res) => {
+  let aggQuery = [];
+  if (req.query.oneWord || req.query.inSimple || req.query.language || req.query.baseline) {
+    aggQuery.push({ $match: { } });
+  }
+  if (req.query.oneWord) {
+    aggQuery[0]["$match"].glyphs = { $nin: [" "] };
+  }
+  if (req.query.inSimple) {
+    aggQuery[0]["$match"].inSimple = true;
+  }
+  if (req.query.language) {
+    aggQuery[0]["$match"].language = req.query.language;
+  }
+  if (req.query.baseline && !isNaN(req.query.baseline * 1) && req.query.baseline * 1 > 0) {
+    aggQuery[0]["$match"].baseline = { $size: 1 * req.query.baseline };
+  }
+
+  let count = 100;
+  if (req.query.count && !isNaN(req.query.count * 1) && req.query.count > 0) {
+    count = req.query.count * 1;
+  }
+  aggQuery.push({ $sample: { size: count } });
+
+  Word.aggregate(aggQuery).exec((err, words) => {
+    return res.json(err || words);
+  });
+});
+
 app.get('/random/:language', (req, res) => {
   let lang = req.params.language.toLowerCase()
   if (languages.indexOf(lang) === -1) {
@@ -46,8 +75,24 @@ app.get('/random/:language', (req, res) => {
     });
   }
 
-  Word.aggregate([{ $match: { language: lang }},
-                  { $sample: { size: 1 }}]).exec((err, words) => {
+  let matchQuery = { language: lang };
+  if (req.query.oneWord) {
+    matchQuery.glyphs = { $nin: [" "] };
+  }
+  if (req.query.inSimple) {
+    matchQuery.inSimple = true;
+  }
+  if (req.query.baseline && !isNaN(req.query.baseline * 1) && req.query.baseline * 1 > 0) {
+    matchQuery.baseline = { $size: 1 * req.query.baseline };
+  }
+
+  let count = 1;
+  if (req.query.count && !isNaN(req.query.count * 1) && req.query.count > 0) {
+    count = req.query.count * 1;
+  }
+
+  Word.aggregate([{ $match: matchQuery },
+                  { $sample: { size: count } }]).exec((err, words) => {
     return res.json(err || words[0]);
   });
 });
@@ -69,9 +114,27 @@ app.get('/topic/:language/:category', (req, res) => {
     });
   }
 
-  Word.aggregate([{ $match: { language: lang,
-                              categories: { $in: [catlang + ':' + catname] } } },
-                  { $sample: { size: 1 } }]).exec((err, words) => {
+  let matchQuery = {
+    language: lang,
+    categories: { $in: [catlang + ':' + catname] }
+  };
+  if (req.query.oneWord) {
+    matchQuery.glyphs = { $nin: [" "] };
+  }
+  if (req.query.inSimple) {
+    matchQuery.inSimple = true;
+  }
+  if (req.query.baseline && !isNaN(req.query.baseline * 1) && req.query.baseline * 1 > 0) {
+    matchQuery.baseline = { $size: 1 * req.query.baseline };
+  }
+
+  let count = 1;
+  if (req.query.count && !isNaN(req.query.count * 1) && req.query.count > 0) {
+    count = req.query.count * 1;
+  }
+
+  Word.aggregate([{ $match: matchQuery },
+                  { $sample: { size: count } }]).exec((err, words) => {
     if (err) {
       return res.json(err);
     }
@@ -79,12 +142,6 @@ app.get('/topic/:language/:category', (req, res) => {
       return res.json({ error: 'none found' });
     }
     return res.json(words[0]);
-  });
-});
-
-app.get('/words', (req, res) => {
-  Word.aggregate([{ $sample: { size: 100 } }]).exec((err, words) => {
-    return res.json(err || words);
   });
 });
 
