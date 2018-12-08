@@ -78,11 +78,11 @@ let findGoodTopic = (language, callback) => {
     if (lastName) {
       formatText += ' (last name only)';
     }
-    callback(null, articleName, formatText);
+    callback(null, articleName, formatText, language);
   });
 };
 
-function addWord(err, articleName, articleClue) {
+function addWord(err, articleName, articleClue, language) {
   if (err) {
     return console.log(err);
   }
@@ -90,14 +90,17 @@ function addWord(err, articleName, articleClue) {
   request.post('https://alif-word-bank.herokuapp.com/word', {
     json: {
       word: articleName,
-      clue: articleClue
+      clue: articleClue,
+      language: language
     }
   }, (err, response, body) => {
     console.log(err || body);
   });
 }
 
-// get 10 words as starting point
-for (var w = 0; w < 10; w++) {
-  findGoodTopic('ar', addWord);
+let wordCount = 200;
+for (var w = 0; w < wordCount; w++) {
+  setTimeout(() => {
+    findGoodTopic('fa', addWord);
+  }, Math.round(wordCount * 500 * Math.random()));
 }
