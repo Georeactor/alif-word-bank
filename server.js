@@ -156,7 +156,9 @@ app.post('/word', (req, res) => {
         glyphs: GlyphSplitter(normal),
         baseline: BaselineSplitter(normal),
         shaped: GlyphSplitter(WordShaper(normal)),
-        categories: req.body.categories || []
+        categories: req.body.categories || [],
+        inSimple: (req.body.inSimple === 'yes'),
+        translations: req.body.translations
       });
   w.save((err) => {
     res.json(err || 'saved');

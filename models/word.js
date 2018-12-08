@@ -9,7 +9,14 @@ const wordSchema = mongoose.Schema({
   glyphs: [String],
   baseline: [String],
   categories: [String],
-  inSimple: Boolean
+  inSimple: Boolean,
+  translations: {
+    ar: String,
+    fa: String,
+    en: String,
+    zht: String,
+    zhs: String
+  }
 });
 
 module.exports = mongoose.model('Word', wordSchema);
