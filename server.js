@@ -93,7 +93,7 @@ app.get('/random/:language', (req, res) => {
 
   Word.aggregate([{ $match: matchQuery },
                   { $sample: { size: count } }]).exec((err, words) => {
-    return res.json(err || words[0]);
+    return res.json(err || words);
   });
 });
 
@@ -141,7 +141,7 @@ app.get('/topic/:language/:category', (req, res) => {
     if (!words.length) {
       return res.json({ error: 'none found' });
     }
-    return res.json(words[0]);
+    return res.json(words);
   });
 });
 
