@@ -9,7 +9,7 @@ for (let i = 0; i < codeBlocks.length; i++) {
     composed += '&nbsp;&nbsp;';
     if (typeof jn[key] === 'object') {
       composed += '"' + key + '" : [ "' + jn[key].join('" , "') + '" ]';
-    } else if (['language', '_id', '__v'].indexOf(key) > -1) {
+    } else if (['language', '_id', '__v', 'en', 'zh'].indexOf(key) > -1) {
       composed += '"' + jn[key] + '" : "' + key + '"';
     } else {
       composed += '"' + key + '" : "' + jn[key] + '"';
